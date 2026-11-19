@@ -57,6 +57,9 @@ def load_params():
             E[r, k] = float(row.iloc[7 + i])
             c[r, k] = float(row.iloc[12 + i])
 
+    # Fuel price ($/gal), used by run_scenario to separate fuel and non-fuel cost
+    P_f = float(summary["Fuel Price $/gal (P_f)"].iloc[0])
+
     # Check that the routes match in both files
     if set(R) != set(costs["route (r)"]):
         raise ValueError("Routes do not match between CSV files")
@@ -90,7 +93,8 @@ def load_params():
         "E": E,
         "E_base": E_base,
         "x0": x0,
-        "cost_base": cost_base
+        "cost_base": cost_base,
+        "P_f": P_f
     }
 
 

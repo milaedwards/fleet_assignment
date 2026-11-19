@@ -4,11 +4,12 @@ import gurobipy as gp
 from gurobipy import GRB
 
 
-def solve(p, alpha):
+def solve(p, alpha, buffer=1.1):
     R, K = p["R"], p["K"]
     m = gp.Model("fleet_assignment")
     m.Params.OutputFlag = 0
     m.Params.DualReductions = 0
+    m.Params.Seed = 0
 
     # Decision variable: x[r,k] = number of round trips on route r by aircraft type k
     x = m.addVars(R, K, vtype=GRB.INTEGER, lb=0, name="x")
@@ -36,7 +37,7 @@ def solve(p, alpha):
 
     # Total flying hours of an aircraft cannot be larger than total hours available
     for k in K:
-        m.addConstr(gp.quicksum(p["T"][r, k] * x[r, k] for r in R) <= 1.1 * p["N"][k] * p["U"][k])
+        m.addConstr(gp.quicksum(p["T"][r, k] * x[r, k] for r in R) <= buffer * p["N"][k] * p["U"][k])
 
     m.optimize()
     return m, x
